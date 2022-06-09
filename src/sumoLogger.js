@@ -272,8 +272,7 @@ class SumoLogger {
     } = optionalConfig;
 
     const ts = time || new Date();
-    const sessKey = sessionKey || this.config.session;
-    const client = url ? { url } : { url: this.config.clientUrl };
+    const sessionId = sessionKey || this.config.session;
     const url = perMessageUrl && { url: perMessageUrl }
       || this.config.clientUrl && { url: this.config.clientUrl }
       || {};
@@ -291,20 +290,10 @@ class SumoLogger {
       if (this.config.raw) {
         return item;
       }
-      if (typeof item === 'string') {
-        return JSON.stringify(
-          Object.assign({
-            msg: item,
-            sessionId: sessKey,
-            timestamp,
-          }, url)
-        );
-      }
-      const current = {
-        sessionId: sessKey,
-        timestamp,
-      };
-      return JSON.stringify(Object.assign(current, client, item));
+
+      const msg = typeof item === "string" ? { msg: item } : item
+
+      return JSON.stringify(Object.assign({ sessionId, timestamp, msg, url }));
     });
 
     this.pendingLogs = this.pendingLogs.concat(messages);
