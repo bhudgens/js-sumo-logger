@@ -36,10 +36,10 @@ function marshalHttpResponse(response) {
 class SumoLogger {
   constructor(options) {
     if (
-      !options ||
-      !Object.prototype.hasOwnProperty.call(options, 'endpoint') ||
-      options.endpoint === undefined ||
-      options.endpoint === ''
+      !options
+      || !Object.prototype.hasOwnProperty.call(options, 'endpoint')
+      || options.endpoint === undefined
+      || options.endpoint === ''
     ) {
       console.error('An endpoint value must be provided');
       return;
@@ -58,9 +58,9 @@ class SumoLogger {
     this.config = {
       endpoint: newConfig.endpoint,
       returnPromise: Object.prototype.hasOwnProperty.call(
-        newConfig,
-        'returnPromise'
-      )
+          newConfig,
+          'returnPromise'
+        )
         ? newConfig.returnPromise
         : true,
       clientUrl: newConfig.clientUrl || '',
@@ -225,76 +225,60 @@ class SumoLogger {
   }
 
   log(msg, optionalConfig) {
-    let message = msg;
 
-    if (!message) {
-      console.error('A value must be provided');
-      return false;
-    }
-
-    const isArray = message instanceof Array;
-    const testEl = isArray ? message[0] : message;
-    const type = typeof testEl;
+    const message = [].concat(msg);
+    const type = typeof message[0];
 
     if (type === 'undefined') {
       console.error('A value must be provided');
       return false;
     }
 
-    if (
-      this.config.graphite &&
-      (!Object.prototype.hasOwnProperty.call(testEl, 'path') ||
-        !Object.prototype.hasOwnProperty.call(testEl, 'value'))
-    ) {
-      console.error(
-        'Both "path" and "value" properties must be provided in the message object to send Graphite metrics'
-      );
-      return false;
-    }
-
-    if (
-      this.config.carbon2 &&
-      (!Object.prototype.hasOwnProperty.call(testEl, 'intrinsic_tags') ||
-        !Object.prototype.hasOwnProperty.call(testEl, 'meta_tags') ||
-        !Object.prototype.hasOwnProperty.call(testEl, 'value'))
-    ) {
-      console.error(
-        'All "intrinsic_tags", "meta_tags" and "value" properties must be provided in the message object to send Carbon2 metrics'
-      );
-      return false;
-    }
-
     if (type === 'object') {
-      if (Object.keys(message).length === 0) {
+      const check = message[0];
+      if (Object.keys(check).length === 0) {
         console.error('A non-empty JSON object must be provided');
+        return false;
+      }
+
+      if (
+        this.config.graphite
+        && (!Object.prototype.hasOwnProperty.call(check, 'path')
+          || !Object.prototype.hasOwnProperty.call(check, 'value'))
+      ) {
+        console.error(
+          'Both "path" and "value" properties must be provided in the message object to send Graphite metrics'
+        );
+        return false;
+      }
+
+      if (
+        this.config.carbon2
+        && (!Object.prototype.hasOwnProperty.call(check, 'intrinsic_tags')
+          || !Object.prototype.hasOwnProperty.call(check, 'meta_tags')
+          || !Object.prototype.hasOwnProperty.call(check, 'value'))
+      ) {
+        console.error(
+          'All "intrinsic_tags", "meta_tags" and "value" properties must be provided in the message object to send Carbon2 metrics'
+        );
         return false;
       }
     }
 
-    if (!isArray) {
-      message = [message];
-    }
+    const {
+      sessionKey,
+      timestamp: time,
+      url: perMessageUrl
+    } = optionalConfig;
 
-    let ts = new Date();
-    let sessKey = this.config.session;
-    const client = { url: this.config.clientUrl };
-
-    if (optionalConfig) {
-      if (Object.prototype.hasOwnProperty.call(optionalConfig, 'sessionKey')) {
-        sessKey = optionalConfig.sessionKey;
-      }
-
-      if (Object.prototype.hasOwnProperty.call(optionalConfig, 'timestamp')) {
-        ts = optionalConfig.timestamp;
-      }
-
-      if (Object.prototype.hasOwnProperty.call(optionalConfig, 'url')) {
-        client.url = optionalConfig.url;
-      }
-    }
+    const ts = time || new Date();
+    const sessKey = sessionKey || this.config.session;
+    const client = url ? { url } : { url: this.config.clientUrl };
+    const url = perMessageUrl && { url: perMessageUrl }
+      || this.config.clientUrl && { url: this.config.clientUrl }
+      || {};
 
     const timestamp = formatDate(ts);
-
     const messages = message.map((item) => {
       if (this.config.graphite) {
         return `${item.path} ${item.value} ${Math.round(ts.getTime() / 1000)}`;
@@ -309,14 +293,11 @@ class SumoLogger {
       }
       if (typeof item === 'string') {
         return JSON.stringify(
-          Object.assign(
-            {
-              msg: item,
-              sessionId: sessKey,
-              timestamp,
-            },
-            client
-          )
+          Object.assign({
+            msg: item,
+            sessionId: sessKey,
+            timestamp,
+          }, url)
         );
       }
       const current = {
@@ -335,3 +316,4 @@ class SumoLogger {
 }
 
 module.exports = SumoLogger;
+
