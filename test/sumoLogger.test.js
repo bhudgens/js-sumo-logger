@@ -51,8 +51,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.log(message, {
@@ -81,10 +80,10 @@ describe('sumoLogger', () => {
       );
 
       const body = JSON.stringify({
+        key: 'value',
         sessionId: sessionKey,
         timestamp: formatDate(timestamp),
-        url: 'url',
-        key: 'value',
+        url: 'url'
       });
 
       expect(superagent.post).toHaveBeenCalledWith(endpoint);
@@ -101,8 +100,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.log([message], {
@@ -133,8 +131,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.log(message, {
@@ -468,8 +465,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.updateConfig({
@@ -502,8 +498,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.updateConfig({
@@ -529,8 +524,7 @@ describe('sumoLogger', () => {
       const body = JSON.stringify({
         msg: message,
         sessionId: sessionKey,
-        timestamp: formatDate(timestamp),
-        url: '',
+        timestamp: formatDate(timestamp)
       });
 
       logger.updateConfig({});

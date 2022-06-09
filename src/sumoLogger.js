@@ -293,7 +293,7 @@ class SumoLogger {
 
       const msg = typeof item === "string" ? { msg: item } : item
 
-      return JSON.stringify(Object.assign({ sessionId, timestamp, msg, url }));
+      return JSON.stringify(Object.assign(msg, { sessionId, timestamp }, url));
     });
 
     this.pendingLogs = this.pendingLogs.concat(messages);
