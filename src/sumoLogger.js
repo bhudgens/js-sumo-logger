@@ -224,7 +224,7 @@ class SumoLogger {
     return this.sendLogs();
   }
 
-  log(msg, optionalConfig) {
+  log(msg, optionalConfig = {}) {
 
     const message = [].concat(msg);
     const type = typeof message[0];
