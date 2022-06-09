@@ -226,8 +226,7 @@ class SumoLogger {
 
   log(msg, optionalConfig = {}) {
 
-    const message = [].concat(msg);
-    const type = typeof message[0];
+    const type = typeof msg;
 
     if (type === 'undefined') {
       console.error('A value must be provided');
@@ -267,17 +266,18 @@ class SumoLogger {
 
     const {
       sessionKey,
-      timestamp: time,
+      timestamp: date,
       url: perMessageUrl
     } = optionalConfig;
 
-    const ts = time || new Date();
+    const _date = date || new Date();
     const sessionId = sessionKey || this.config.session;
     const url = perMessageUrl && { url: perMessageUrl }
       || this.config.clientUrl && { url: this.config.clientUrl }
       || {};
 
-    const timestamp = formatDate(ts);
+    const timestamp = formatDate(_date);
+    const message = [].concat(msg);
     const messages = message.map((item) => {
       if (this.config.graphite) {
         return `${item.path} ${item.value} ${Math.round(ts.getTime() / 1000)}`;
