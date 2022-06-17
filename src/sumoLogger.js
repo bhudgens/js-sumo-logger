@@ -234,7 +234,7 @@ class SumoLogger {
     }
 
     if (type === 'object') {
-      const check = message[0];
+      const check = msg;
       if (Object.keys(check).length === 0) {
         console.error('A non-empty JSON object must be provided');
         return false;
